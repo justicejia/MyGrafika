@@ -1,0 +1,3 @@
+# MyGrafika
+整合了Archive百度SDK和google开源项目Grafika，实现了视频的预览，录制mp4，并且有实时的美颜效果
+目前只取到了H264格式的视频，下一步需要转换成mp4.
