@@ -22,7 +22,7 @@ import android.view.SurfaceHolder;
 
 
 /**
- * LiveSession 为推流SDK的接口类， 该SDK包含音视频采集、编码、推流等功能模块， 并为用户提供友好的编程接口。
+ * LiveSession 推流SDK的接口类， 该SDK包含音视频采集、编码、推流等功能模块， 并为用户提供友好的编程接口。
  * 
  * 默认情况下，该SDK提供的视频编码参数为720p@24fps，码率为1024kbps 音频编码参数为双声道、采样率为44.1khz，码率为64kbps
  * 
@@ -49,7 +49,6 @@ public class LiveSessionHW extends LiveSession {
     private int mZoomFactor = 0;
     private static final String NAME_OF_LIB_RTMP = "librtmp_jni.so";
     private static boolean isLibRtmpLoaded = false;
-
     private int mVideoWidth = 1280;
     private int mVideoHeight = 720;
     private int mVideoBitrate = 1024000;
@@ -396,12 +395,6 @@ public class LiveSessionHW extends LiveSession {
         try {
             mAudioEncoder = new AudioEncoder(ACODEC, null);
             mVideoEncoder = new VideoEncoder(VCODEC, null);
-//            mVideoEncoder.setVideoDataListener(new VideoEncoder.MyVideoDataListener() {
-//                @Override
-//                public void writeData(ByteBuffer es, MediaCodec.BufferInfo bi) {
-//
-//                }
-//            });
 
             mAudioEncoder.setupEncoder(mAudioDevice.getSampleRate(), mAudioDevice.getChannelCount(), mAudioBitrate/1000);
             if (ScreenUtils.screenIsLanscape(mContext)) {

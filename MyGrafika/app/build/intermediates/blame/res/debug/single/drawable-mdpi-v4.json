@@ -1,5 +1,9 @@
 [
     {
+        "merged": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/flash_off.png",
+        "source": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/res/drawable-mdpi/flash_off.png"
+    },
+    {
         "merged": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/to_stop.png",
         "source": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/src/main/res/drawable-mdpi/to_stop.png"
     },
@@ -12,20 +16,48 @@
         "source": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/src/main/res/drawable-mdpi/switch_camera.png"
     },
     {
+        "merged": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/switch_camera.png",
+        "source": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/res/drawable-mdpi/switch_camera.png"
+    },
+    {
+        "merged": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/ico_focus.png",
+        "source": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/res/drawable-mdpi/ico_focus.png"
+    },
+    {
         "merged": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/block.png",
         "source": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/src/main/res/drawable-mdpi/block.png"
+    },
+    {
+        "merged": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/flash_on.png",
+        "source": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/res/drawable-mdpi/flash_on.png"
     },
     {
         "merged": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/flash_on.png",
         "source": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/src/main/res/drawable-mdpi/flash_on.png"
     },
     {
+        "merged": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/ic_launcher.png",
+        "source": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/res/drawable-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/to_start.png",
+        "source": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/res/drawable-mdpi/to_start.png"
+    },
+    {
         "merged": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/ic_launcher.png",
         "source": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/src/main/res/drawable-mdpi/ic_launcher.png"
     },
     {
+        "merged": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/to_stop.png",
+        "source": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/res/drawable-mdpi/to_stop.png"
+    },
+    {
         "merged": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/to_start.png",
         "source": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/src/main/res/drawable-mdpi/to_start.png"
+    },
+    {
+        "merged": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/block.png",
+        "source": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/res/drawable-mdpi/block.png"
     },
     {
         "merged": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/ico_focus.png",

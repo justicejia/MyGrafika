@@ -1,5 +1,9 @@
 [
     {
+        "merged": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/res/merged/debug/menu/main.xml",
+        "source": "/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/res/menu/main.xml"
+    },
+    {
         "merged": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/build/intermediates/res/merged/debug/menu/main.xml",
         "source": "/Users/jiayuanmin/Desktop/Git/Android_Camera/MyGrafika/app/src/main/res/menu/main.xml"
     }

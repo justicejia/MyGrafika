@@ -19,7 +19,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 /**
- * LiveSession 为推流SDK的接口类， 该SDK包含音视频采集、编码、推流等功能模块， 并为用户提供友好的编程接口。
+ * LiveSession为推流SDK的接口类， 该SDK包含音视频采集、编码、推流等功能模块， 并为用户提供友好的编程接口。
  * 
  * 默认情况下，该SDK提供的视频编码参数为720p@24fps，码率为1024kbps 音频编码参数为双声道、采样率为44.1khz，码率为64kbps
  * 

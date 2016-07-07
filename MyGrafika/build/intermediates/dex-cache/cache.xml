@@ -1,2 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
+
+    <item
+        jar="/Users/jiayuanmin/Library/Android/sdk/extras/android/m2repository/com/android/support/support-v4/19.1.0/support-v4-19.1.0.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67">
+        <dex dex="/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/pre-dexed/debug/support-v4-19.1.0_7ecb041dc4537815ab690dfe074a5b3f5bd6038b.jar" />
+    </item>
+    <item
+        jar="/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/libs/visionin.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="5e410872bf4588e8aecd4a41e15fa09658aee970">
+        <dex dex="/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/pre-dexed/debug/visionin_365a8fa37eaed4baac30d3b7ff2f97fcef81a58f.jar" />
+    </item>
+    <item
+        jar="/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/libs/android-async-http-1.4.6.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="a845a88238be0b5be9d238652c1bc0605ef91f52">
+        <dex dex="/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/pre-dexed/debug/android-async-http-1.4.6_b372d1767602287d3510146939464edd309133e0.jar" />
+    </item>
+    <item
+        jar="/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/libs/fastjson.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="94d4ebd4acdaf01d7445435382eea2d2d38e7534">
+        <dex dex="/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/pre-dexed/debug/fastjson_c9849e8feb57bb676a05b3a2f908dbfe8a1ca425.jar" />
+    </item>
+    <item
+        jar="/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/src/main/libs/me.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="ae500abddb32054f414519ea66fc1a64d5e0427d">
+        <dex dex="/Users/jiayuanmin/Desktop/Git/Android/MyGrafika/MyGrafika/app/build/intermediates/pre-dexed/debug/me_80862cf4551a40ddd1834588ad604c7ac21c7ca6.jar" />
+    </item>
+
+</items>

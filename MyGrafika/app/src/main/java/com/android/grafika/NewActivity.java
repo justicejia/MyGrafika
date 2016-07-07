@@ -48,7 +48,6 @@ public class NewActivity extends Activity  {
     private com.android.grafika.baidu.recorder.api.LiveSession mLiveSession=null;
     private Button mRecorderButton = null;
     private VideoCaptureDevice mVideoCaptureDevice;
-    private FileChannel ops;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +62,6 @@ public class NewActivity extends Activity  {
         mCurrentCamera = Camera.CameraInfo.CAMERA_FACING_BACK;
         isFlashOn = false;
         initRTMPSession(mCameraView.getHolder());
-        File file=new File(Environment.getExternalStorageDirectory().getAbsolutePath(),"test.h264");
-        try {
-            ops=new FileOutputStream(file).getChannel();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
 
         mFlashStateButton.setOnClickListener(flashListener);
         mCameraStateButton.setOnClickListener(switchlistener);
@@ -76,8 +69,6 @@ public class NewActivity extends Activity  {
 
 
     }
-
-
 
 
 
@@ -99,6 +90,8 @@ public class NewActivity extends Activity  {
         mLiveSession.prepareSessionAsync();
         mVideoCaptureDevice=mLiveSession.getDevice();
     }
+
+
 
     View.OnClickListener saveListener=new View.OnClickListener() {
         @Override

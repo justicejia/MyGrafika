@@ -74,12 +74,9 @@ public class VideoEncoder {
 
     private String mVideoCodecMimeType = null;
     private int mVideoTrack = 100;
-    private MediaCodecInfo.CodecProfileLevel mMaxProfileLevel = null;
-
     private FlvMuxer mFlvMuxer = null;
     private volatile boolean isEncoding = false;
 
-    private static MyVideoDataListener videoDataListener;
 
 
 
@@ -406,55 +403,6 @@ public class VideoEncoder {
 
 
 
-//        public void saveVideo(File outputFile) {
-//
-//            Log.d(TAG,"begin save");
-//            if (VERBOSE) Log.d(TAG, "saveVideo " + outputFile);
-//
-//            int index = mEncBuffer.getFirstIndex();
-//            if (index < 0) {
-//                Log.w(TAG, "Unable to get first index");
-////                mCallback.fileSaveComplete(1);
-//                return;
-//            }
-//
-//            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-//            MediaMuxer muxer = null;
-//            int result = -1;
-//            try {
-//                muxer = new MediaMuxer(outputFile.getPath(),
-//                        MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-//                int videoTrack = muxer.addTrack(mEncodedFormat);
-//                muxer.start();
-//
-//                do {
-//                    ByteBuffer buf = mEncBuffer.getChunk(index, info);
-//                    if (VERBOSE) {
-//                        Log.d(TAG, "SAVE " + index + " flags=0x" + Integer.toHexString(info.flags));
-//                    }
-//                    muxer.writeSampleData(videoTrack, buf, info);
-//                    index = mEncBuffer.getNextIndex(index);
-//                } while (index >= 0);
-//                result = 0;
-//            } catch (IOException ioe) {
-//                Log.w(TAG, "muxer failed", ioe);
-//                result = 2;
-//            } finally {
-//                if (muxer != null) {
-//                    muxer.stop();
-//                    muxer.release();
-//                }
-//            }
-//
-//            if (VERBOSE) {
-//                Log.d(TAG, "muxer stopped, result=" + result);
-//            }
-////            mCallback.fileSaveComplete(result);
-//        }
-
-
-
-
 
 
 
@@ -477,11 +425,7 @@ public class VideoEncoder {
                     // not expected for an encoder
                     if (mEncoder.isEncoding) encoderOutputBuffers = mEncoder.mAVCEncoder.getOutputBuffers();
                 } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                    // Should happen before receiving buffers, and should only happen once.
-                    // The MediaFormat contains the csd-0 and csd-1 keys, which we'll need
-                    // for MediaMuxer.  It's unclear what else MediaMuxer might want, so
-                    // rather than extract the codec-specific data and reconstruct a new
-                    // MediaFormat later, we just grab it here and keep it around.
+
                     if (mEncoder.isEncoding) mEncodedFormat = mEncoder.mAVCEncoder.getOutputFormat();
                     Log.d(TAG, "encoder output format changed: " + mEncodedFormat);
                 } else if (encoderStatus < 0) {
@@ -501,9 +445,7 @@ public class VideoEncoder {
                         // adjust the ByteBuffer values to match BufferInfo (not needed?)
                         encodedData.position(mBufferInfo.offset);
                         encodedData.limit(mBufferInfo.offset + mBufferInfo.size);
-//
-//                        mEncBuffer.add(encodedData, mBufferInfo.flags,
-//                                mBufferInfo.presentationTimeUs);
+
                         if(isRecording){
                             try {
                                 fc.write(encodedData);
@@ -606,15 +548,7 @@ public class VideoEncoder {
         if (mFlvMuxer != null) {
             mFlvMuxer.clearSendingBuffer();
         }
-        }
-
-    public void setVideoDataListener(MyVideoDataListener videoDataListener) {
-        this.videoDataListener = videoDataListener;
     }
 
-    public interface MyVideoDataListener {
 
-        void writeData(ByteBuffer es, MediaCodec.BufferInfo bi);
-
-    }
 }
