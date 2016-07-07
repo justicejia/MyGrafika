@@ -455,7 +455,6 @@ public class VideoEncoder {
                         }
 
 
-
                         if (mEncoder.isEncoding) mEncoder.onEncodedAnnexbFrame(encodedData, mBufferInfo);
 
                         if (VERBOSE) {

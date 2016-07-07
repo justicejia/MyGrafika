@@ -110,6 +110,7 @@ public class LiveSessionHW extends LiveSession {
         mVideoDevice.openCamera(mVideoWidth,mVideoHeight,mVideoFps,0,true);
 
 
+
     }
     public VideoCaptureDevice getDevice(){
         return mVideoDevice;

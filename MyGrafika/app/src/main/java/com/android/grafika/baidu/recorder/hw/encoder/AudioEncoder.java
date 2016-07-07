@@ -79,7 +79,7 @@ public class AudioEncoder {
         
         ByteBuffer[] outBuffers = null;
         if (!isEncoding) return;
-        outBuffers = mAACEncoder.getOutputBuffers();
+        outBuffers = mAACEncoder.getOutputBuffers();     //这里获取了音频数据
 
         if (isEncoding) {
             int inBufferIndex = mAACEncoder.dequeueInputBuffer(-1);
