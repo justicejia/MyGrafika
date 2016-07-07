@@ -411,7 +411,6 @@ public class VideoEncoder {
          * Drains all pending output from the decoder, and adds it to the circular buffer.
          */
         public void drainEncoder() {
-            Log.d(TAG,"DrainEncoder!!!!!!!!!!!!");
             if (!mEncoder.isEncoding) return;
             final int TIMEOUT_USEC = 0;     // no timeout -- check for buffers, bail if none
 
