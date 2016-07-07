@@ -1,0 +1,27 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        applicationId "com.android.grafika"
+        minSdkVersion 18
+        targetSdkVersion 18
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:19.1.0'
+    compile files('src/main/libs/visionin.jar')
+    compile files('src/main/libs/me.jar')
+    compile files('src/main/libs/fastjson.jar')
+    compile files('src/main/libs/android-async-http-1.4.6.jar')
+}

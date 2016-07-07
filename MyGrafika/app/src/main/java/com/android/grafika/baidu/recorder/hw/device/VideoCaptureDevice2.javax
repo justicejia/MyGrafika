@@ -1,0 +1,406 @@
+package com.baidu.recorder.hw.device;
+
+import java.io.IOException;
+
+import com.baidu.recorder.hw.encoder.VideoEncoder;
+import com.baidu.recorder.hw.graghic.CameraUtils;
+import com.baidu.recorder.hw.graghic.EglCore;
+import com.baidu.recorder.hw.graghic.FullFrameRect;
+import com.baidu.recorder.hw.graghic.Texture2dProgram;
+import com.baidu.recorder.hw.graghic.WindowSurface;
+
+import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
+import android.opengl.GLES20;
+import android.util.Log;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+
+/**
+ * Created by andy on 4/29/16.
+ */
+public class VideoCaptureDevice implements AutoFocusCallback, SurfaceHolder.Callback,
+        SurfaceTexture.OnFrameAvailableListener {
+    private static final String TAG = "VideoCaptureDevice";
+    private EglCore mEglCore;
+    private WindowSurface mDisplaySurface;
+    private SurfaceTexture mCameraTexture;  // receives the output from the camera preview
+    private FullFrameRect mFullFrameBlit;
+    private final float[] mTmpMatrix = new float[16];
+    private int mTextureId;
+
+    private Camera mCamera;
+    private int mCurrentCameraId = 0;
+    private int mCameraPreviewThousandFps;
+    private VideoEncoder mEncoder;
+    private WindowSurface mEncoderSurface;
+
+    private long mPresentationTimeNs = 0;
+    private volatile boolean isSendingVideo = true;
+
+    private int targetVideoWidth, targetVideoHeight;
+    private int previewVideoWidth, previewVideoHeight;
+    private Camera.Size mCameraPreviewSize = null;
+    private int previewFps;
+    private boolean hasPreviewContextInited = false;
+    private volatile boolean hasCameraPreviewStarted = false;
+    private boolean isOrientationPortrait = false;
+
+    private String currentFocusMode = Camera.Parameters.FOCUS_MODE_AUTO;
+
+    public VideoCaptureDevice(VideoEncoder encoder) {
+        mEglCore = new EglCore(null, EglCore.FLAG_RECORDABLE);
+        mEncoder = encoder;
+        isSendingVideo = true;
+        hasPreviewContextInited = false;
+        targetVideoWidth = 0;
+        targetVideoHeight = 0;
+        previewVideoWidth = 0;
+        previewVideoHeight = 0;
+        previewFps = 0;
+    }
+
+    public void setEncoder(VideoEncoder encoder) {
+        mEncoder = encoder;
+    }
+
+    /**
+     * Opens a camera, and attempts to establish preview mode at the specified width and height.
+     * <p>
+     * Sets mCameraPreviewFps to the expected frame rate (which might actually be variable).
+     */
+    public boolean openCamera(int desiredWidth, int desiredHeight, int desiredFps, int cameraId, boolean isPortrait) {
+        if (mCamera != null) {
+            return true;
+        }
+        previewFps = desiredFps;
+        isOrientationPortrait = isPortrait;
+        Camera.CameraInfo info = new Camera.CameraInfo();
+
+        // Try to find a front-facing camera (e.g. for videoconferencing).
+        int numCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numCameras; i++) {
+            Camera.getCameraInfo(i, info);
+            if (info.facing == cameraId) {
+                mCamera = Camera.open(i);
+                break;
+            }
+        }
+        if (mCamera == null) {
+            return false;
+        }
+
+        mCurrentCameraId = cameraId;
+        Camera.Parameters parms = mCamera.getParameters();
+
+        Camera.Size realSize = CameraUtils.choosePreviewSize(parms, desiredWidth, desiredHeight);
+
+        if (isPortrait) {
+            targetVideoWidth = realSize.height;
+            targetVideoHeight = realSize.width;
+            parms.set("orientation", "portrait"); //
+        } else {
+            targetVideoWidth = realSize.width;
+            targetVideoHeight = realSize.height;
+            parms.set("orientation", "landscape"); //
+        }
+        mCameraPreviewSize = realSize;
+
+        // Try to set the frame rate to a constant value.
+        mCameraPreviewThousandFps = CameraUtils.chooseFixedPreviewFps(parms, desiredFps * 1000);
+
+        // Give the camera a hint that we're recording video.  This can have a big
+        // impact on frame rate.
+        parms.setRecordingHint(true);
+
+        if (isPortrait) mCamera.setDisplayOrientation(90);
+        mCamera.setParameters(parms);
+
+        if (mCameraTexture != null) {
+            startCameraPreview();
+        }
+
+        Camera.Size cameraPreviewSize = parms.getPreviewSize();
+        String previewFacts = cameraPreviewSize.width + "x" + cameraPreviewSize.height +
+                " @" + (mCameraPreviewThousandFps / 1000.0f) + "fps";
+        Log.i(TAG, "Camera config: " + previewFacts);
+        return true;
+    }
+    
+    public int getAdaptedVideoWidth() {
+        return mCameraPreviewSize.width;
+    }
+    
+    public int getAdaptedVideoHeight() {
+        return mCameraPreviewSize.height;
+    }
+
+    /**
+     * Stops camera preview, and releases the camera to the system.
+     */
+    public void closeCamera() {
+        if (mCamera != null) {
+            stopCameraPreview();
+            mCamera.release();
+            mCamera = null;
+            Log.d(TAG, "releaseCamera -- done");
+        }
+    }
+
+    public void release() {
+        destroyPreviewContext();
+        if (mEglCore != null) {
+            mEglCore.release();
+            mEglCore = null;
+        }
+        mEncoderSurface = null;
+    }
+
+    public void toggleFlash(boolean flag) {
+        if (mCamera != null && mCurrentCameraId != Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            String flashMode = flag ? Camera.Parameters.FLASH_MODE_TORCH : Camera.Parameters.FLASH_MODE_OFF;
+            Camera.Parameters parms = mCamera.getParameters();
+            CameraUtils.chooseFlashMode(parms, flashMode);
+            mCamera.setParameters(parms);
+        }
+    }
+
+    public boolean canSwitchCamera() {
+        // Check the number of cameras
+        return Camera.getNumberOfCameras() > 1;
+    }
+
+    public void switchCamera(int cameraId) {
+        if (mCamera != null) closeCamera();
+        if (isOrientationPortrait) {
+            openCamera(targetVideoHeight, targetVideoWidth, previewFps, cameraId, isOrientationPortrait);
+        } else {
+            openCamera(targetVideoWidth, targetVideoHeight, previewFps, cameraId, isOrientationPortrait);
+        }
+    }
+
+    /**
+     * 设置对焦焦点
+     *
+     * @param x
+     * @param y
+     */
+    public void focusToPoint(int x, int y) {
+        if (mCamera != null && hasCameraPreviewStarted) {
+            Camera.Parameters params = mCamera.getParameters();
+            CameraUtils.chooseFocusPoint(params, currentFocusMode, x, y, targetVideoWidth, targetVideoHeight);
+            mCamera.cancelAutoFocus();
+            mCamera.setParameters(params);
+            try {
+                mCamera.autoFocus(this);
+            } catch (Throwable t) {
+                Log.e(TAG, "Touch to auto focus failed!");
+            }
+        }
+    }
+
+    /**
+     * 获取相机最大的放大因子
+     */
+    public int getMaxZoomFactor() {
+        if (mCamera != null) {
+            Camera.Parameters params = mCamera.getParameters();
+            if (!params.isZoomSupported()) {
+                return 0;
+            }
+            return params.getMaxZoom();
+        }
+        return -1;
+    }
+
+    /**
+     * 设置相机放大因子
+     * @param factor
+     */
+    public boolean setZoomFactor(int factor) {
+        if (mCamera != null) {
+            Camera.Parameters params = mCamera.getParameters();
+            if (!params.isZoomSupported()) {
+                return false;
+            }
+            int maxZoom = params.getMaxZoom();
+            if (factor > maxZoom || factor < 0) {
+                return false;
+            }
+            try {
+                params.setZoom(factor);
+                mCamera.setParameters(params);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void setOutputSurface(Surface sf) {
+        if (sf != null) {
+            mEncoderSurface = new WindowSurface(mEglCore, sf, true);
+        } else {
+//            Log.e(TAG, "The output surface is null.");
+            mEncoderSurface = null;
+        }
+    }
+
+    public void setEpoch(long pts) {
+        mPresentationTimeNs = pts;
+    }
+
+    private void initPreviewContext(SurfaceHolder holder) {
+        // Set up everything that requires an EGL context.
+        //
+        // We had to wait until we had a surface because you can't make an EGL context current
+        // without one, and creating a temporary 1x1 pbuffer is a waste of time.
+        //
+        // The display surface that we use for the SurfaceView, and the encoder surface we
+        // use for video, use the same EGL context.
+        if (hasPreviewContextInited) {
+            return;
+        }
+        hasPreviewContextInited = true;
+        mDisplaySurface = new WindowSurface(mEglCore, holder.getSurface(), false);
+        mDisplaySurface.makeCurrent();
+        mFullFrameBlit = new FullFrameRect(new Texture2dProgram(Texture2dProgram.ProgramType.TEXTURE_EXT));
+        mTextureId = mFullFrameBlit.createTextureObject();
+        mCameraTexture = new SurfaceTexture(mTextureId);
+        mCameraTexture.setOnFrameAvailableListener(this);
+    }
+
+    private void destroyPreviewContext() {
+        if (!hasPreviewContextInited) {
+            return;
+        }
+
+        hasPreviewContextInited = false;
+        if (mCameraTexture != null) {
+            mCameraTexture.setOnFrameAvailableListener(null);
+            mCameraTexture.release();
+            mCameraTexture = null;
+        }
+        if (mDisplaySurface != null) {
+            mDisplaySurface.release();
+            mDisplaySurface = null;
+        }
+        if (mFullFrameBlit != null) {
+            mFullFrameBlit.release(false);
+            mFullFrameBlit = null;
+        }
+    }
+
+    private void startCameraPreview() {
+        if (hasCameraPreviewStarted) {
+            return;
+        }
+
+        try {
+            if (mCamera != null) {
+                Log.d(TAG, "starting camera preview");
+                mCamera.setPreviewTexture(mCameraTexture);
+                mCamera.startPreview();
+                hasCameraPreviewStarted = true;
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+    private void stopCameraPreview() {
+        if (!hasCameraPreviewStarted) {
+            return;
+        }
+
+        if (mCamera != null) {
+            Log.d(TAG, "stop camera preview");
+            hasCameraPreviewStarted = false;
+            mCamera.stopPreview();
+        }
+    }
+
+    @Override   // SurfaceHolder.Callback
+    public void surfaceCreated(SurfaceHolder holder) {
+        Log.d(TAG, "surfaceCreated holder=" + holder);
+        initPreviewContext(holder);
+        startCameraPreview();
+    }
+
+    @Override   // SurfaceHolder.Callback
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        previewVideoWidth = width;
+        previewVideoHeight = height;
+        Log.d(TAG, "surfaceChanged fmt=" + format + " size=" + width + "x" + height +
+                " holder=" + holder);
+    }
+
+    @Override   // SurfaceHolder.Callback
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        Log.d(TAG, "surfaceDestroyed holder=" + holder);
+        stopCameraPreview();
+        destroyPreviewContext();
+    }
+
+    @Override   // SurfaceTexture.OnFrameAvailableListener; runs on arbitrary thread
+    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+        //Log.d(TAG, "frame available");
+        this.drawFrame(previewVideoWidth, previewVideoHeight);
+    }
+
+    @Override
+    public void onAutoFocus(boolean arg0, Camera arg1) {
+        if (arg0) {
+            Log.d(TAG, "Auto-Focus succeeded!");
+        } else {
+            Log.d(TAG, "Auto-Focus failed!");
+        }
+    }
+
+    public void setVideoEnabled(boolean flag) {
+        isSendingVideo = flag;
+    }
+
+    /**
+     * Draws a frame onto the SurfaceView and the encoder surface.
+     * <p>
+     * This will be called whenever we get a new preview frame from the camera.  This runs
+     * on the UI thread, which ordinarily isn't a great idea -- you really want heavy work
+     * to be on a different thread -- but we're really just throwing a few things at the GPU.
+     * The upside is that we don't have to worry about managing state changes between threads.
+     * <p>
+     * If there was a pending frame available notification when we shut down, we might get
+     * here after onPause().
+     */
+    private void drawFrame(int width, int height) {
+        //Log.d(TAG, "drawFrame");
+        if (!hasPreviewContextInited) {
+            Log.d(TAG, "Skipping drawFrame after shutdown");
+            return;
+        }
+
+        // Latch the next frame from the camera.
+        mDisplaySurface.makeCurrent();
+        mCameraTexture.updateTexImage();
+        mCameraTexture.getTransformMatrix(mTmpMatrix);
+
+        GLES20.glViewport(0, 0, width, height);
+        mFullFrameBlit.drawFrame(mTextureId, mTmpMatrix);
+        mDisplaySurface.swapBuffers();
+
+        if (mEncoderSurface != null && isSendingVideo) {
+            mEncoderSurface.makeCurrent();
+            GLES20.glViewport(0, 0, targetVideoWidth, targetVideoHeight);
+            if (mCurrentCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                mFullFrameBlit.drawMirroredFrame(mTextureId, mTmpMatrix);
+            } else {
+                mFullFrameBlit.drawFrame(mTextureId, mTmpMatrix);
+            }
+            mEncoder.frameAvailableSoon();
+            mEncoderSurface.setPresentationTime(System.nanoTime() - mPresentationTimeNs);
+            mEncoderSurface.swapBuffers();
+        }
+    }
+}

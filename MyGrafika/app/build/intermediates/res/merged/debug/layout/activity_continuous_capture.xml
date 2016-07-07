@@ -1,0 +1,52 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/requestLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                tools:context=".ContinuousCaptureActivity" >
+
+    <SurfaceView
+            android:id="@+id/continuousCapture_surfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true" />
+    <ImageView
+            android:id="@+id/iv_focus"
+            android:background="@drawable/ico_focus"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:visibility="gone" />
+
+
+    <Button
+            android:id="@+id/flash_ctl"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="30dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/flash_off"
+             />
+
+    <Button
+            android:id="@+id/camera_ctl"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="30dp"
+            android:layout_marginRight="30dp"
+            android:background="@drawable/switch_camera"
+            />
+
+
+    <Button
+            android:id="@+id/capture_button"
+            android:layout_width="47dp"
+            android:layout_height="47dp"
+            android:background="@drawable/btn"
+            android:button="@null"
+            android:layout_alignTop="@+id/flash_ctl" android:layout_centerHorizontal="true" android:checked="false"/>
+</RelativeLayout>
